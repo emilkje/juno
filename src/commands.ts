@@ -1,35 +1,50 @@
-// import * as vscode from "vscode";
-// import { createOpenAiApi, submit } from "./openai";
-// import { createResultPanel } from "./panel";
+import * as vscode from "vscode";
+import { createOpenAiApi, submit } from "./openai";
+import { createResultPanel } from "./panel";
+import { Command } from "./types";
 
-// export function createSuggestImprovementsCommand (context:vscode.ExtensionContext) {
-//     return async () => {
+export const openPromptCommand:Command = {
+	name: "juno.openPrompt",
+	factory: (context:vscode.ExtensionContext) => {
+		return async () => {
+			
+			const openai = createOpenAiApi();
+	
+			if(!openai) {
+				console.error("failed to create OpenAiApi")
+				return;
+			}
+	
+			const prompt = await vscode.window.showInputBox({
+				placeHolder: "Juno at your service",
+				prompt: "What can I help you with?",
+				value: "",
+			});
+	
+			if (prompt) {
+				const panel = await createResultPanel(context.extensionUri, context.extensionPath);
+				submit(openai, panel, prompt);
+			}
+		}
+	}
+}
 
-// 		const openai = createOpenAiApi();
+export const suggestImprovementsCommand:Command = {
+	name: "juno.suggestImprovements",
+	factory: (context:vscode.ExtensionContext) => {
 
-// 		if(!openai) {
-// 			console.error("failed to create OpenAiApi")
-// 			return;
-// 		}
-
-// 		const prompt = "How may I improve this code? Consider? Be thorough and think clearly about software patterns that can be used to improve it. Also provide code snippets relevant to your response.";
-// 		const panel = createResultPanel(context.extensionUri, context.extensionPath);
-// 		submit(openai, panel, prompt);
-//     }
-// }
-
-// // export const suggestImprovements = async () => {
-// //     const openai = createOpenAiApi();
-    
-// //     if(!openai) {
-// //         console.error("failed to create OpenAIApi");
-// //         return;
-// //     }
-
-// //     if(!panel) {
-// //         panel = createResultPanel(context.extensionUri, context.extensionPath);
-// //     }
-    
-// //     const prompt = "How may I improve this code? First give me a high level overview and then drill down and give me actual code snippets if relevant.";
-// //     submit(openai, panel, prompt);
-// // }
+		return async () => {
+			const openai = createOpenAiApi();
+		
+			if(!openai) {
+				console.error("failed to create OpenAiApi")
+				return;
+			}
+		
+			const prompt = "How may I improve this code?";
+			const panel = await createResultPanel(context.extensionUri, context.extensionPath);
+		
+			submit(openai, panel, prompt);
+		}
+	}
+}

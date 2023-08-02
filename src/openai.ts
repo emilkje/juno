@@ -47,3 +47,65 @@ export function getApiKey(): string | undefined {
 		return;
 	}
 }
+
+export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:string) {
+
+	const editor = vscode.window.activeTextEditor;
+	let context = "";
+
+	const messages: ChatCompletionRequestMessage[] = [
+		{role: 'system', content: 'You are a helpful coding assistant that always responds in markdown format. When providing full code blocks you have to qualify it with what language. e.g ```javascript or ```typescript. When providing contextual snippets, try to provide which line of code it belongs.'}
+	];
+
+	if (editor) {
+		const document = editor.document;
+		
+		context = editor.selections.length > 1
+			? document.getText(editor.selection) 
+			: document.getText();
+
+		vscode.window.showInformationMessage(`${editor.selections.length}`);
+
+		messages.push({ role: "user", content: `answer the following question using the current context if applicable.\n\nCONTEXT:\n${context}\n\nQUESTION:${prompt}` });
+	} else {
+		messages.push({ role: "user", content: prompt });
+	}
+
+	panel.webview.postMessage({type: 'stream.start'});
+
+	openai.createChatCompletion({
+		model: "gpt-3.5-turbo",
+		messages: messages,
+		stream: true,
+	}, {responseType: 'stream'}).then(chatCompletion => {
+		// const result = chatCompletion.data.choices[0].message;
+		const stream = chatCompletion.data as unknown as IncomingMessage;
+
+		console.log(stream);
+		const buffer:Array<string> = [];
+		stream.on('data', (chunk:Buffer) => {
+			const payloads = chunk.toString().split("\n\n");
+			for(const payload of payloads) {
+				if(payload.includes("[DONE]")) {
+					panel.webview.postMessage({type: 'stream.end'});
+					return;
+				}
+
+				if (payload.startsWith("data:")) {
+					const data = JSON.parse(payload.replace("data: ", ""));
+					try {
+						const chunk: undefined | string = data.choices[0].delta?.content;
+						if (chunk) {
+							buffer.push(chunk);
+							const content = marked.parse(buffer.join(""), {headerIds: false, mangle: false});
+							panel.webview.postMessage({type: 'stream.update', content: content});
+						}
+					} catch (error) {
+						panel.webview.postMessage({type: 'error', content: `Error with JSON.parse and ${payload}.\n${error}`});
+						console.log(`Error with JSON.parse and ${payload}.\n${error}`);
+					}
+				}
+			}
+		});
+	});
+}

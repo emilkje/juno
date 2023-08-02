@@ -17,6 +17,6 @@ export async function getNonce(): Promise<string> {
   
     return nonce;
   } catch (err) {
-    throw new Error('Failed to generate nonce');
+    throw new Error(`Failed to generate nonce: ${err}`);
   }
 }

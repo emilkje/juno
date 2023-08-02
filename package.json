@@ -28,6 +28,16 @@
         "command": "juno.suggestImprovements",
         "category": "Juno",
         "title": "Suggest Improvements"
+      },
+      {
+        "command": "juno.selectModel",
+        "category": "Juno",
+        "title": "Select model"
+      },
+      {
+        "command": "juno.createCode",
+        "category": "Juno",
+        "title": "Create Code"
       }
     ],
     "configuration": {

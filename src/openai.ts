@@ -5,6 +5,11 @@ import { markedHighlight } from "marked-highlight";
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import * as vscode from "vscode";
 
+// gpt-3.5-turbo
+// const model = "text-davinci-003"
+let defaultModel = "gpt-3.5-turbo";
+export const MODEL_KEY = "openai.model";
+
 export function createOpenAiApi(): OpenAIApi | undefined {
 	try {
 		const openAiConfiguration = createConfigurationFromSettings();
@@ -48,7 +53,7 @@ export function getApiKey(): string | undefined {
 	}
 }
 
-export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:string) {
+export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:string, model?:string) {
 
 	const editor = vscode.window.activeTextEditor;
 	let context = "";
@@ -60,11 +65,9 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 	if (editor) {
 		const document = editor.document;
 		
-		context = editor.selections.length > 1
-			? document.getText(editor.selection) 
-			: document.getText();
-
-		vscode.window.showInformationMessage(`${editor.selections.length}`);
+		context = editor.selection.isEmpty
+			? document.getText() 
+			: document.getText(editor.selection);
 
 		messages.push({ role: "user", content: `answer the following question using the current context if applicable.\n\nCONTEXT:\n${context}\n\nQUESTION:${prompt}` });
 	} else {
@@ -73,8 +76,11 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 
 	panel.webview.postMessage({type: 'stream.start'});
 
+	const current_model = model || defaultModel;
+	console.log(`creating chat completion using ${current_model}`);
+	
 	openai.createChatCompletion({
-		model: "gpt-3.5-turbo",
+		model: current_model,
 		messages: messages,
 		stream: true,
 	}, {responseType: 'stream'}).then(chatCompletion => {
@@ -106,6 +112,66 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 					}
 				}
 			}
+		});
+	});
+}
+
+let buffer:Array<string> = [];
+
+export function conversation(openai:OpenAIApi, panel:vscode.WebviewPanel, messages:ChatCompletionRequestMessage[], model?:string): Promise<string> {
+
+	// panel.webview.postMessage({type: 'stream.start'});
+
+	const current_model = model || defaultModel;
+	console.log(`creating chat completion using ${current_model}`);
+	
+	return new Promise((resolve, reject) => {
+			
+		console.log(messages);
+		
+		openai.createChatCompletion({
+			model: current_model,
+			messages: messages,
+			stream: true,
+		}, {responseType: 'stream'}).then(chatCompletion => {
+			// const result = chatCompletion.data.choices[0].message;
+			const stream = chatCompletion.data as unknown as IncomingMessage;
+	
+			// const buffer:Array<string> = [];
+			// clear buffer when the conversation starts
+			// or add a separator for the next section
+			if(messages.filter(m => m.role == "user").length <= 1) {
+				buffer = [];
+			} else {
+				buffer.push("\n\n---\n\n")
+			}
+	
+			stream.on('data', (chunk:Buffer) => {
+				const payloads = chunk.toString().split("\n\n");
+				for(const payload of payloads) {
+					if(payload.includes("[DONE]")) {
+						panel.webview.postMessage({type: 'stream.end'});
+						resolve(buffer.toString());
+						return;
+					}
+	
+					if (payload.startsWith("data:")) {
+						const data = JSON.parse(payload.replace("data: ", ""));
+						try {
+							const chunk: undefined | string = data.choices[0].delta?.content;
+							if (chunk) {
+								buffer.push(chunk);
+								const content = marked.parse(buffer.join(""), {headerIds: false, mangle: false});
+								panel.webview.postMessage({type: 'stream.update', content: content});
+							}
+						} catch (error) {
+							panel.webview.postMessage({type: 'error', content: `Error with JSON.parse and ${payload}.\n${error}`});
+							console.log(`Error with JSON.parse and ${payload}.\n${error}`);
+							reject(error)
+						}
+					}
+				}
+			});
 		});
 	});
 }

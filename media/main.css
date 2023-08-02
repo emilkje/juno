@@ -1,3 +1,16 @@
 body {
 	background-color: transparent;
 }
+
+p {
+	line-height: 1.3em;
+}
+
+.result {
+	padding: 10px;
+}
+
+hr {
+	margin: 5px 0 10px;
+	border: 1px solid var(--vscode-textSeparator-foreground);
+}

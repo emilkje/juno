@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { configure as configureMarkdownParser } from './markdown';
-import * as commands from './commands';
+import * as commands from './commands/';
 
 configureMarkdownParser();
 
@@ -13,17 +13,18 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "juno" is now active!');
-
+	console.log(Object.values(commands));
+	
 	// register commands
-	try {
-		for(const command of Object.values(commands)) {
+	for(const command of Object.values(commands)) {
+		try {
 			context.subscriptions.push(
 				vscode.commands.registerCommand(command.name, command.factory(context))
 			)
+		} catch(error) {
+			console.error(`failed to register ${command.name}`, error);
+			vscode.window.showErrorMessage(`error registering command ${command.name}: ${error}`);
 		}
-	} catch(error) {
-		console.error(error);
-		vscode.window.showErrorMessage(`error registering commands: ${error}`);
 	}
 }
 

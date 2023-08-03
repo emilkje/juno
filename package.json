@@ -38,6 +38,11 @@
         "command": "juno.createCode",
         "category": "Juno",
         "title": "Create Code"
+      },
+      {
+        "command": "juno.functionsExample",
+        "category": "Juno",
+        "title": "Functions example"
       }
     ],
     "configuration": {

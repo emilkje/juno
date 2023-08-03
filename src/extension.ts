@@ -12,9 +12,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "juno" is now active!');
-	console.log(Object.values(commands));
-	
+	console.log('"Juno" is now active!');
+
 	// register commands
 	for(const command of Object.values(commands)) {
 		try {

@@ -53,6 +53,17 @@ export function getApiKey(): string | undefined {
 	}
 }
 
+let buffer:Array<string> = [];
+
+export type InferenceOptions = {
+	onDidStart?: () => void,
+	onDidEnd?: (result:string) => void,
+	onDidReceiveChunk?:(chunk:string) => void,
+	onDidUpdate?:(content:string) => void,
+	onError?:(error:any) => void,
+	model?: string,
+}
+
 export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:string, model?:string) {
 
 	const editor = vscode.window.activeTextEditor;
@@ -87,7 +98,6 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 		// const result = chatCompletion.data.choices[0].message;
 		const stream = chatCompletion.data as unknown as IncomingMessage;
 
-		console.log(stream);
 		const buffer:Array<string> = [];
 		stream.on('data', (chunk:Buffer) => {
 			const payloads = chunk.toString().split("\n\n");
@@ -98,8 +108,8 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 				}
 
 				if (payload.startsWith("data:")) {
-					const data = JSON.parse(payload.replace("data: ", ""));
 					try {
+						const data = JSON.parse(payload.replace("data: ", ""));
 						const chunk: undefined | string = data.choices[0].delta?.content;
 						if (chunk) {
 							buffer.push(chunk);
@@ -116,18 +126,15 @@ export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:strin
 	});
 }
 
-let buffer:Array<string> = [];
+export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMessage[], options?:InferenceOptions): Promise<string> {
 
-export function conversation(openai:OpenAIApi, panel:vscode.WebviewPanel, messages:ChatCompletionRequestMessage[], model?:string): Promise<string> {
-
-	// panel.webview.postMessage({type: 'stream.start'});
-
-	const current_model = model || defaultModel;
-	console.log(`creating chat completion using ${current_model}`);
-	
 	return new Promise((resolve, reject) => {
 			
-		console.log(messages);
+		options?.onDidStart?.();
+
+		const current_model = options?.model || defaultModel;
+		console.log(`creating chat completion using ${current_model}`);
+	
 		
 		openai.createChatCompletion({
 			model: current_model,
@@ -150,23 +157,23 @@ export function conversation(openai:OpenAIApi, panel:vscode.WebviewPanel, messag
 				const payloads = chunk.toString().split("\n\n");
 				for(const payload of payloads) {
 					if(payload.includes("[DONE]")) {
-						panel.webview.postMessage({type: 'stream.end'});
+						options?.onDidEnd?.(buffer.toString());
 						resolve(buffer.toString());
 						return;
 					}
 	
 					if (payload.startsWith("data:")) {
-						const data = JSON.parse(payload.replace("data: ", ""));
 						try {
+							const data = JSON.parse(payload.replace("data: ", ""));
 							const chunk: undefined | string = data.choices[0].delta?.content;
 							if (chunk) {
 								buffer.push(chunk);
-								const content = marked.parse(buffer.join(""), {headerIds: false, mangle: false});
-								panel.webview.postMessage({type: 'stream.update', content: content});
+								options?.onDidReceiveChunk?.(chunk);
+								options?.onDidUpdate?.(buffer.join(""));
 							}
 						} catch (error) {
-							panel.webview.postMessage({type: 'error', content: `Error with JSON.parse and ${payload}.\n${error}`});
-							console.log(`Error with JSON.parse and ${payload}.\n${error}`);
+							options?.onError?.(error);
+							console.log(`Received error ${payload}.\n${error}`);
 							reject(error)
 						}
 					}

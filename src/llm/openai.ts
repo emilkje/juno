@@ -64,68 +64,6 @@ export type InferenceOptions = {
 	model?: string,
 }
 
-export function submit(openai:OpenAIApi, panel:vscode.WebviewPanel, prompt:string, model?:string) {
-
-	const editor = vscode.window.activeTextEditor;
-	let context = "";
-
-	const messages: ChatCompletionRequestMessage[] = [
-		{role: 'system', content: 'You are a helpful coding assistant that always responds in markdown format. When providing full code blocks you have to qualify it with what language. e.g ```javascript or ```typescript. When providing contextual snippets, try to provide which line of code it belongs.'}
-	];
-
-	if (editor) {
-		const document = editor.document;
-		
-		context = editor.selection.isEmpty
-			? document.getText() 
-			: document.getText(editor.selection);
-
-		messages.push({ role: "user", content: `answer the following question using the current context if applicable.\n\nCONTEXT:\n${context}\n\nQUESTION:${prompt}` });
-	} else {
-		messages.push({ role: "user", content: prompt });
-	}
-
-	panel.webview.postMessage({type: 'stream.start'});
-
-	const current_model = model || defaultModel;
-	console.log(`creating chat completion using ${current_model}`);
-	
-	openai.createChatCompletion({
-		model: current_model,
-		messages: messages,
-		stream: true,
-	}, {responseType: 'stream'}).then(chatCompletion => {
-		// const result = chatCompletion.data.choices[0].message;
-		const stream = chatCompletion.data as unknown as IncomingMessage;
-
-		const buffer:Array<string> = [];
-		stream.on('data', (chunk:Buffer) => {
-			const payloads = chunk.toString().split("\n\n");
-			for(const payload of payloads) {
-				if(payload.includes("[DONE]")) {
-					panel.webview.postMessage({type: 'stream.end'});
-					return;
-				}
-
-				if (payload.startsWith("data:")) {
-					try {
-						const data = JSON.parse(payload.replace("data: ", ""));
-						const chunk: undefined | string = data.choices[0].delta?.content;
-						if (chunk) {
-							buffer.push(chunk);
-							const content = marked.parse(buffer.join(""), {headerIds: false, mangle: false});
-							panel.webview.postMessage({type: 'stream.update', content: content});
-						}
-					} catch (error) {
-						panel.webview.postMessage({type: 'error', content: `Error with JSON.parse and ${payload}.\n${error}`});
-						console.log(`Error with JSON.parse and ${payload}.\n${error}`);
-					}
-				}
-			}
-		});
-	});
-}
-
 export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMessage[], options?:InferenceOptions): Promise<string> {
 
 	return new Promise((resolve, reject) => {

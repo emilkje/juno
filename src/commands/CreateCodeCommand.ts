@@ -1,11 +1,11 @@
 import * as vscode from 'vscode';
 
-import { Command } from "../types";
-import { 
-	initializeConversation, 
+import { createCommand } from "@juno/command";
+import {
+	initializeConversation,
 	processUserPrompts,
 	createSystemMessage,
-} from './common';
+} from '@juno/common';
 
 /**
  * `OpenPromptCommand` is a VS Code command object intended to provide
@@ -28,18 +28,15 @@ import {
  * @example
  * Register command in vscode: vscode.commands.registerCommand(OpenPromptCommand.name, OpenPromptCommand.factory(context))
  */
-export const CreateCodeCommand: Command = {
-	name: 'juno.createCode',
-	factory: context => async () => {
-		// const systemMessage = generateSystemMessage(context);
-		const instructions = `$USER will give you instructions to help write functions. 
+export const createCodeCommand = createCommand('juno.createCode', async (context) => {
+	// const systemMessage = generateSystemMessage(context);
+	const instructions = `$USER will give you instructions to help write functions. 
 You may ask for clarification if needed, but otherwise you should only output $LANGUAGE code. 
 Provide explanations of the code only if the user asks for them. 
 Make sure to respond with the code inside a markdown code block (e.g. \´\´\´typescript) or \´\´\´python.`;
 
-		const systemMessage = createSystemMessage(context, instructions)
-		const messages = initializeConversation(systemMessage);
+	const systemMessage = createSystemMessage(context, instructions)
+	const messages = initializeConversation(systemMessage);
 
-		await processUserPrompts(context, messages);
-	}
-}
+	await processUserPrompts(context, messages);
+});

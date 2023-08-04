@@ -1,15 +1,14 @@
 import * as vscode from 'vscode';
 
-import { Command } from '../types';
+import { createCommand } from '@juno/command';
 import { 
 	createSystemMessage,
 	initializeConversation,
-	processUserPrompts,
 	runConversation,
-} from './common';
+} from '@juno/common';
 
 /**
- * `OpenPromptCommand` is a VS Code command object intended to provide
+ * `openPromptCommand` is a VS Code command object intended to provide
  * a generic conversation endpoint for the language model.
  * 
  * When registered and invoked in VS Code, it initiates a conversation,
@@ -29,10 +28,8 @@ import {
  * @example
  * Register command in vscode: vscode.commands.registerCommand(OpenPromptCommand.name, OpenPromptCommand.factory(context))
  */
-export const SuggestImprovementsCommand: Command = {
-	name: 'juno.suggestImprovements',
-	factory: context => async () => {
-		const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 
+export const suggestImprovementsCommand = createCommand('juno.suggestImprovements', async (context) => {
+	const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 
 
 Always adhere to the folling rules:
 
@@ -41,11 +38,10 @@ Always adhere to the folling rules:
 3. Always answer as $ASSISTANT and avoid using phrases as "as a large language model" etc.
 4. Use the scratchpad if relevant to the question`;
 
-		const systemMessage = createSystemMessage(context, instructions);
-		console.log('using system message', systemMessage);
-		const messages = initializeConversation(systemMessage);
-		messages.push({role: 'user', content: 'How may I improve this code?'});
+	const systemMessage = createSystemMessage(context, instructions);
+	console.log('using system message', systemMessage);
+	const messages = initializeConversation(systemMessage);
+	messages.push({role: 'user', content: 'How may I improve this code?'});
 
-		await runConversation(context, messages);
-	}
-}
+	await runConversation(context, messages);
+});

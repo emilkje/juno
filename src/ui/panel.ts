@@ -1,6 +1,6 @@
 import {join as joinPath} from 'path';
 import * as vscode from 'vscode';
-import { getNonce } from './nonce';
+import { getNonce } from '@juno/ui/nonce';
 
 let _panel:vscode.WebviewPanel
 let _panelIsDisposed = false

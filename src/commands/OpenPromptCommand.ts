@@ -1,12 +1,11 @@
-
 import * as vscode from 'vscode';
 
-import { Command } from '../types';
+import { createCommand } from '@juno/command';
 import { 
 	createSystemMessage,
 	initializeConversation,
 	processUserPrompts
-} from './common';
+} from '@juno/common';
 
 /**
  * `OpenPromptCommand` is a VS Code command object intended to provide
@@ -29,10 +28,8 @@ import {
  * @example
  * Register command in vscode: vscode.commands.registerCommand(OpenPromptCommand.name, OpenPromptCommand.factory(context))
  */
-export const OpenPromptCommand: Command = {
-	name: 'juno.openPrompt',
-	factory: context => async () => {
-		const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 
+export const openPromptCommand = createCommand('juno.openPrompt', async (context) => {
+	const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 
 
 Always adhere to the folling rules:
 
@@ -41,10 +38,9 @@ Always adhere to the folling rules:
 3. Always answer as $ASSISTANT and avoid using phrases as "as a large language model" etc.
 4. Use the scratchpad if relevant to the question`;
 
-		const systemMessage = createSystemMessage(context, instructions)
-		console.log('using system message', systemMessage);
-		const messages = initializeConversation(systemMessage);
+	const systemMessage = createSystemMessage(context, instructions)
+	console.log('using system message', systemMessage);
+	const messages = initializeConversation(systemMessage);
 
-		await processUserPrompts(context, messages);
-	}
-}
+	await processUserPrompts(context, messages);
+});

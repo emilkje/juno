@@ -1,18 +1,38 @@
 {
+	"include": [
+		"src"
+	],
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "ES2020",
 		"outDir": "out",
+		// "baseUrl": "./src",
+		"paths": {
+			"@juno/*": [
+				"./src/*"
+			]
+		},
 		"lib": [
 			"ES2020",
 			"DOM"
 		],
+		"plugins": [
+			/* Transform paths in output .js files */
+			{
+				"transform": "typescript-transform-paths"
+			},
+			/* Transform paths in output .d.ts files */
+			{
+				"transform": "typescript-transform-paths",
+				"afterDeclarations": true
+			}
+		],
 		"sourceMap": true,
 		"rootDir": "src",
-		"strict": true   /* enable all strict type-checking options */
+		"strict": true /* enable all strict type-checking options */
 		/* Additional Checks */
 		// "noImplicitReturns": true, /* Report error when not all code paths in function return a value. */
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
-	}
+	},
 }

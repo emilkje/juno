@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
-import { InferenceOptions, MODEL_KEY, conversation, createOpenAiApi, submit } from '../openai';
-import { createResultPanel } from '../panel';
+import { InferenceOptions, MODEL_KEY, conversation, createOpenAiApi } from '@juno/llm/openai';
+import { createResultPanel } from '@juno/ui/panel';
 import { ChatCompletionRequestMessage } from 'openai';
 import { marked } from 'marked';
 

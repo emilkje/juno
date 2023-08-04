@@ -5,52 +5,32 @@ import { markedHighlight } from "marked-highlight";
 import { ChatCompletionRequestMessage, Configuration, OpenAIApi } from "openai";
 import * as vscode from "vscode";
 
+import { ConfigurationMissingError } from "@juno/errors";
+
 // gpt-3.5-turbo
 // const model = "text-davinci-003"
 let defaultModel = "gpt-3.5-turbo";
 export const MODEL_KEY = "openai.model";
 
 export function createOpenAiApi(): OpenAIApi | undefined {
-	try {
-		const openAiConfiguration = createConfigurationFromSettings();
-
-		if (!openAiConfiguration) {
-			console.error("Failed to create OpenAI configuration.");
-			return;
-		}
-
-		return new OpenAIApi(openAiConfiguration);
-	} catch (error) {
-		console.error("Failed to create OpenAI API.", error);
-		return;
-	}
+	const openAiConfiguration = createConfigurationFromSettings();
+	return new OpenAIApi(openAiConfiguration);
 }
 
 export function createConfigurationFromSettings(): Configuration | undefined {
-	try {
-		const apiKey = getApiKey();
-
-		if (!apiKey) {
-			console.log("No API key configured. Please open the settings panel and configure your OpenAI api key");
-			return;
-		}
-
-		return new Configuration({ apiKey: apiKey });
-	} catch (error) {
-		console.error("Failed to create OpenAI configuration.", error);
-		return;
-	}
+	const apiKey = getApiKey();
+	return new Configuration({ apiKey: apiKey });
 }
 
 export function getApiKey(): string | undefined {
-	try {
-		const settings = vscode.workspace.getConfiguration('juno');
-		const apiKey = settings.get<string>("apiKey");
-		return apiKey;
-	} catch (error) {
-		console.error("Failed to retrieve API key from settings.", error);
-		return;
+	const settings = vscode.workspace.getConfiguration('juno');
+	const apiKey = settings.get<string>("apiKey");
+
+	if(apiKey === "") {
+		throw new ConfigurationMissingError("juno.apiKey", "OpenAI API Key");
 	}
+	
+	return apiKey;
 }
 
 let buffer:Array<string> = [];

@@ -27,6 +27,7 @@ export const indexFileCommand = createCommand('juno.indexFile', async (ctx, uri:
 });
 
 async function indexFile(index:LocalIndex, file:vscode.Uri) {
+
     const api = createOpenAiApi();
 
     if(!api) {

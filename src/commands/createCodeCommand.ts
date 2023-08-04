@@ -29,7 +29,7 @@ import {
  * Register command in vscode: vscode.commands.registerCommand(OpenPromptCommand.name, OpenPromptCommand.factory(context))
  */
 export const createCodeCommand = createCommand('juno.createCode', async (context) => {
-	// const systemMessage = generateSystemMessage(context);
+	
 	const instructions = `$USER will give you instructions to help write functions. 
 You may ask for clarification if needed, but otherwise you should only output $LANGUAGE code. 
 Provide explanations of the code only if the user asks for them. 

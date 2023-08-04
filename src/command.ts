@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 
-type CommandHandler = (ctx:vscode.ExtensionContext) => void | Promise<void>;
+type CommandHandler = (ctx:vscode.ExtensionContext, ...args:any[]) => void | Promise<void>;
 
 export default class Command {
 

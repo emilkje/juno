@@ -1,0 +1,1 @@
+This directory will be populated with an index.json file containing vectors when indexing the repository.

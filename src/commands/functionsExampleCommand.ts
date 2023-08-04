@@ -4,6 +4,15 @@ import { ChatCompletionRequestMessage } from 'openai';
 import { createCommand } from '@juno/command';
 import { createOpenAiApi } from '@juno/llm/openai';
 
+/**
+ * Executes the functionExampleCommand.
+ * 
+ * This function sends a chat message to the OpenAI GPT-3 model and handles the response.
+ * It interacts with the getStaffInfo function to retrieve contact information about staff members.
+ * If the user request includes a function call, it executes the function and returns the result.
+ * 
+ * @returns {Promise<void>} A promise that resolves when the command execution is complete.
+ */
 export const functionExampleCommand = createCommand('juno.functionsExample', async () => {
 
 	const openai = createOpenAiApi();

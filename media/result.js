@@ -1,7 +1,11 @@
 //@ts-check
 
 // This script will be run within the webview itself
-// It cannot access the main VS Code APIs directly.
+// It cannot access the main VS Code APIs directly, but
+// are communicating with the panel through post messages.
+
+// The main purpose of this file is to render the generated 
+// output into the workspace side panel.
 (function () {
 
     // Handle messages sent from the extension to the webview

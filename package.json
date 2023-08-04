@@ -48,6 +48,16 @@
         "command": "juno.test",
         "category": "Juno",
         "title": "Test command"
+      },
+      {
+        "command": "juno.indexRepo",
+        "category": "Juno",
+        "title": "Index Repository"
+      },
+      {
+        "command": "juno.queryRepo",
+        "category": "Juno",
+        "title": "Query Repository"
       }
     ],
     "configuration": {
@@ -91,6 +101,7 @@
     "highlight.js": "^11.8.0",
     "marked": "^5.1.2",
     "marked-highlight": "^2.0.1",
-    "openai": "^3.3.0"
+    "openai": "^3.3.0",
+    "vectra": "^0.1.2"
   }
 }

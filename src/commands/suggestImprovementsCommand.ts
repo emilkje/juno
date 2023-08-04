@@ -8,25 +8,13 @@ import {
 } from '@juno/common';
 
 /**
- * `openPromptCommand` is a VS Code command object intended to provide
- * a generic conversation endpoint for the language model.
+ * Creates a command that suggests improvements.
  * 
- * When registered and invoked in VS Code, it initiates a conversation,
- * consisting of instructions and subsequent user prompts.
- * It adheres and enforces standardized communication rules described in
- * the instructions.
- *
- * @property name - A string naming the command ('juno.openPrompt').
- * @property factory - The function to execute when the command is invoked.
- *                     Accepts the command `context` and returns a promise.
- *
- * @param {vscode.ExtensionContext} context - The extension context in which the command is executed.
- *
- * @returns {Promise} - This command returns a promise. The promise is resolved
- *                      after all user prompts are processed within the context.
- *
- * @example
- * Register command in vscode: vscode.commands.registerCommand(OpenPromptCommand.name, OpenPromptCommand.factory(context))
+ * This command allows users to suggest improvements to the code. It prompts the user to provide feedback or suggestions, 
+ * and then processes and displays the suggestions in a meaningful way. It ensures that internal implementation details are not leaked.
+ * 
+ * @param context - The VSCode ExtensionContext.
+ * @returns A Promise that resolves when the code generation is complete.
  */
 export const suggestImprovementsCommand = createCommand('juno.suggestImprovements', async (context) => {
 	const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 

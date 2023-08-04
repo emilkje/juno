@@ -8,7 +8,7 @@ import {
 } from '@juno/common';
 
 /**
- * `OpenPromptCommand` is a VS Code command object intended to provide
+ * `createCodeCommand` is a VS Code command object intended to provide
  * a code generation endpoint for the language model.
  * 
  * When registered and invoked in VS Code, it initiates a conversation,

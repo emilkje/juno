@@ -64,6 +64,11 @@ export type InferenceOptions = {
 	model?: string,
 }
 
+/**
+ * Creates an instance of the OpenAIApi.
+ *
+ * @returns An instance of the OpenAIApi if the configuration is successfully created, otherwise undefined.
+ */
 export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMessage[], options?:InferenceOptions): Promise<string> {
 
 	return new Promise((resolve, reject) => {

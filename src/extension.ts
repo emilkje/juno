@@ -15,18 +15,23 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Juno is now active!');
 
-	// register commands
+	// loop all the commands exported from commands/index.ts
+	// and register them dynamically.
+	console.log("registering commands");
 	for(const command of Object.values(commands)) {
 		try {
 			command.register(context);
-			// context.subscriptions.push(
-			// 	vscode.commands.registerCommand(command.name(), command.register(context))
-			// )
 		} catch(error) {
 			console.error(`failed to register ${command.name}`, error);
 			vscode.window.showErrorMessage(`error registering command ${command.name}: ${error}`);
 		}
 	}
+
+	console.log('creating file watcher');
+	const watcher = vscode.workspace.createFileSystemWatcher('**/src/**');
+	watcher.onDidChange(e => {
+		vscode.commands.executeCommand("juno.indexFile", e);
+	});
 }
 
 // This method is called when your extension is deactivated

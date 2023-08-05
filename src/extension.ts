@@ -4,6 +4,7 @@ import * as vscode from 'vscode';
 
 import * as commands from '@juno/commands';
 import { configure as configureMarkdownParser } from '@juno/ui/markdown';
+import { statusBar } from '@juno/commands/indexRepoCommand';
 
 configureMarkdownParser();
 
@@ -26,6 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage(`error registering command ${command.name}: ${error}`);
 		}
 	}
+
+	context.subscriptions.push(statusBar);
 
 	// console.log('creating file watcher');
 	// const watcher = vscode.workspace.createFileSystemWatcher('**/src/**');

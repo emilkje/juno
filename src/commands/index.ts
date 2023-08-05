@@ -13,3 +13,4 @@ export { testCommand } from './testCommand';
 export { indexRepoCommand } from './indexRepoCommand';
 export { indexFileCommand } from './indexFileCommand';
 export { queryRepoCommand } from './queryRepoCommand';
+export { deleteRepoIndexCommand } from './deleteRepoIndexCommand';

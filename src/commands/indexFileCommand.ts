@@ -38,6 +38,8 @@ async function indexFile(index:LocalIndex, file:vscode.Uri) {
     console.log("gathering content")
     const document = await vscode.workspace.openTextDocument(file);
     const content = document.getText();
+    
+    //TODO: deleting old index
 
     const chunks = splitStr(content, 1000, 200);
     console.log(document.fileName, chunks.length);

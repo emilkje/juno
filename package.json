@@ -58,6 +58,11 @@
         "command": "juno.queryRepo",
         "category": "Juno",
         "title": "Query Repository"
+      },
+      {
+        "command": "juno.deleteRepoIndex",
+        "category": "Juno",
+        "title": "Delete Repository Vector Indicies"
       }
     ],
     "configuration": {

@@ -33,7 +33,7 @@ Query your repository like never before. `Query Repository` will execute a seman
 
 ## Feedback :mailbox:
 
-Loving `Juno`? I want to hear from you! Create a [new issue](https://github.com/emilkje/juno/issues/new) on [GitHub](https://github.com/your-github-username/juno) :bug:
+Loving `Juno`? I want to hear from you! Create a [new issue](https://github.com/emilkje/juno/issues/new) on [GitHub](https://github.com/emilkje/juno) :bug:
 
 Got ideas on how we can make `Juno` better? I'm all ears! Share your thoughts on our [GitHub Discussions](https://github.com/your-github-username/juno/discussions) page :speech_balloon:
 

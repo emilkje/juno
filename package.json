@@ -22,12 +22,6 @@
         "category": "Juno"
       },
       {
-        "command": "juno.clearPrompt",
-        "category": "Juno",
-        "title": "Clear Prompt",
-        "icon": "$(clear-all)"
-      },
-      {
         "command": "juno.suggestImprovements",
         "category": "Juno",
         "title": "Suggest Improvements"
@@ -41,16 +35,6 @@
         "command": "juno.createCode",
         "category": "Juno",
         "title": "Create Code"
-      },
-      {
-        "command": "juno.functionsExample",
-        "category": "Juno",
-        "title": "Functions example"
-      },
-      {
-        "command": "juno.test",
-        "category": "Juno",
-        "title": "Test command"
       },
       {
         "command": "juno.indexRepo",

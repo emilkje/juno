@@ -32,7 +32,7 @@ export const createCodeCommand = createCommand('juno.createCode', async (context
 	
 	const instructions = `$USER will give you instructions to help write functions. 
 You may ask for clarification if needed, but otherwise you should only output $LANGUAGE code. 
-Provide explanations of the code only if the user asks for them. 
+IMPORTANT: Do not explain the code unless told so explicitly. 
 Make sure to respond with the code inside a markdown code block (e.g. \´\´\´typescript) or \´\´\´python.`;
 
 	const systemMessage = createSystemMessage(context, instructions);

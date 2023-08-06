@@ -63,6 +63,7 @@ export const functionExampleCommand = createCommand('juno.functionsExample', asy
 				},
 			},
 		],
+		// eslint-disable-next-line @typescript-eslint/naming-convention
 		function_call: 'auto',
 	});
 
@@ -78,7 +79,7 @@ export const functionExampleCommand = createCommand('juno.functionsExample', asy
 		let dataToReturn = {};
 
 		if (!functionToUse) {
-			console.error("openai indicates that it want to use a function but did not provide what function.", chat.data.choices[0].message)
+			console.error("openai indicates that it want to use a function but did not provide what function.", chat.data.choices[0].message);
 			return;
 		}
 
@@ -145,4 +146,4 @@ const getStaffInfo = (staffPosition: string): { name: string, email: string } =>
 				email: 'Not found'
 			};
 	}
-}
+};

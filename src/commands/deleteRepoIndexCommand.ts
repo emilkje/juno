@@ -20,5 +20,5 @@ export const deleteRepoIndexCommand = createCommand('juno.deleteRepoIndex', asyn
         await index.deleteIndex();
     }
 
-    vscode.window.showInformationMessage("Vector index deleted")
+    vscode.window.showInformationMessage("Vector index deleted");
 });

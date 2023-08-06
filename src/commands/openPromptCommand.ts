@@ -38,7 +38,7 @@ Always adhere to the folling rules:
 3. Always answer as $ASSISTANT and avoid using phrases as "as a large language model" etc.
 4. Use the scratchpad if relevant to the question`;
 
-	const systemMessage = createSystemMessage(context, instructions)
+	const systemMessage = createSystemMessage(context, instructions);
 	console.log('using system message', systemMessage);
 	const messages = initializeConversation(systemMessage);
 

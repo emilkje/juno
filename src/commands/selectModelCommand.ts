@@ -24,7 +24,7 @@ export const selectModelCommand = createCommand('juno.selectModel', async (conte
 
 	if (result) {
 		// setModel(result);
-		context.workspaceState.update(MODEL_KEY, result)
+		context.workspaceState.update(MODEL_KEY, result);
 		vscode.window.showInformationMessage(`Using ${result}`);
 	}
 });

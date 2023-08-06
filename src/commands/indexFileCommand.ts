@@ -35,7 +35,7 @@ async function indexFile(index:LocalIndex, file:vscode.Uri) {
         return;
     }
 
-    console.log("gathering content")
+    console.log("gathering content");
     const document = await vscode.workspace.openTextDocument(file);
     const content = document.getText();
     

@@ -23,7 +23,7 @@ export default class Command {
                 // to the CommandHandler so that it can access it
                 this._fn.bind(this._fn, ctx)
             )
-        )
+        );
     }
 
     name(): string {
@@ -53,7 +53,7 @@ function wrapWithTryCatch(originalFn: CommandHandler): CommandHandler {
                                 "workbench.action.openSettings", 
                                 settingsKey);
                         }
-                    })
+                    });
             }
             else if (error instanceof AggregateConfigurationMissingError) {
                 for(const config of error.configs) {
@@ -65,7 +65,7 @@ function wrapWithTryCatch(originalFn: CommandHandler): CommandHandler {
                 console.error(error);
             } 
         }
-    }
+    };
 }
 
 /**
@@ -83,7 +83,7 @@ function showMissingErrorDialogue(key: string, friendlyName: string) {
                     "workbench.action.openSettings",
                     key);
             }
-        })
+        });
 }
 
 /**
@@ -112,7 +112,7 @@ async function ensureHealthyState() {
  */
 async function ensureNoMissingSettings() {
     // create an array to hold the configuration errors
-    const errors: ConfigurationMissingError[] = []
+    const errors: ConfigurationMissingError[] = [];
 
     // iterate through each required setting
     for (const key of Object.keys(requiredSettings)) {

@@ -9,7 +9,7 @@ Unleash AI power with `Juno` at your side! Leveraging the power of OpenAI, this 
 
 ### :sparkles: Create Code
 
-Using the current editor document or selection run `Create Code` and `Juno` will help generate code using your own code as context to help you write code or documentation. Get ready to turn those blank lines into art! :pencil2:
+Using the current editor document or selection run `Create Code` and `Juno` will help generate code or documentation using your own code as context. Get ready to turn those blank lines into art! :pencil2:
 
 ### :bulb: Suggest Improvements
 

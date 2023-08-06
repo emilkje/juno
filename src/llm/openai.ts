@@ -12,21 +12,21 @@ import { ConfigurationMissingError } from "@juno/errors";
 let defaultModel = "gpt-3.5-turbo";
 export const MODEL_KEY = "openai.model";
 
-export function createOpenAiApi(): OpenAIApi | undefined {
+export function createOpenAiApi(): OpenAIApi {
 	const openAiConfiguration = createConfigurationFromSettings();
 	return new OpenAIApi(openAiConfiguration);
 }
 
-export function createConfigurationFromSettings(): Configuration | undefined {
+export function createConfigurationFromSettings(): Configuration {
 	const apiKey = getApiKey();
 	return new Configuration({ apiKey: apiKey });
 }
 
-export function getApiKey(): string | undefined {
+export function getApiKey(): string {
 	const settings = vscode.workspace.getConfiguration('juno');
 	const apiKey = settings.get<string>("apiKey");
 
-	if(apiKey === "") {
+	if(!apiKey) {
 		throw new ConfigurationMissingError("juno.apiKey", "OpenAI API Key");
 	}
 	

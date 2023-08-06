@@ -39,7 +39,7 @@ export default class Command {
 function wrapWithTryCatch(originalFn: CommandHandler): CommandHandler {
     return async function (ctx: vscode.ExtensionContext, ...args: any[]) {
         try {
-            await ensureHealthyState();
+            await ensureHealthyState(ctx);
             return await originalFn.apply(originalFn, [ctx, ...args]);
         } catch (error) {
             if (error instanceof ConfigurationError) {
@@ -101,9 +101,19 @@ const requiredSettings: Record<string, string> = {
 /**
  * Ensures that the extension is in a healthy state.
  */
-async function ensureHealthyState() {
+async function ensureHealthyState(ctx:vscode.ExtensionContext) {
 
     await ensureNoMissingSettings();
+    await ensureWorkspaceIndexPathCreated(ctx);
+}
+
+async function ensureWorkspaceIndexPathCreated(ctx:vscode.ExtensionContext) {
+    const existing = ctx.workspaceState.get("juno.workspaceId");
+    if(!existing) {
+        // pseudo random string representing the path to store this workspace indicies 
+        const id = `${Date.now().toString(32)}${Math.random().toString(36).substring(2,8)}`;
+        await ctx.workspaceState.update("juno.workspaceId", id);
+    }
 }
 
 /**

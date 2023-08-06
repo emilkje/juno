@@ -1,12 +1,14 @@
-import { createCommand } from '@juno/command';
 import * as vscode from 'vscode';
 import { LocalIndex } from 'vectra';
 import {join as joinPath} from 'path';
-import { createOpenAiApi } from '@juno/llm/openai';
 import { OpenAIApi } from 'openai';
 
+import { createCommand } from '@juno/command';
+import { createOpenAiApi } from '@juno/llm/openai';
+import { getPeristentWorkspaceFolderPath } from '@juno/common';
+
 // list of globs to include
-const includes = ['**/*.*']
+const includes = ['**/*.*'];
 
 // list of globs to exclude
 const excludes = [
@@ -14,7 +16,7 @@ const excludes = [
     '**/out/**',
     '**/vectors/**',
     '**/package-lock.json'
-]
+];
 
 export const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 
@@ -29,7 +31,9 @@ export const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlign
 export const indexRepoCommand = createCommand('juno.indexRepo', async (ctx) => {
 
     // create a local filesystem index database 
-    const index = new LocalIndex(joinPath(ctx.extensionPath, 'vectors'));
+    const vectorPath = joinPath(getPeristentWorkspaceFolderPath(ctx), 'vectors');
+    console.log("using path", vectorPath);
+    const index = new LocalIndex(vectorPath);
 
     if (!await index.isIndexCreated()) {
         await index.createIndex();
@@ -53,13 +57,13 @@ async function indexRepository(index:LocalIndex) {
         return;
     }
 
-    console.log("gathering documents")
+    console.log("gathering documents");
     const files = await vscode.workspace.findFiles(
         `{${includes.join(',')}}`, 
         `{${excludes.join(',')}}`
     );
 
-    console.log("saving vectors")
+    console.log("saving vectors");
     let cancelled = false;
     vscode.window.showInformationMessage(`indexing ${files.length} files`, "Cancel").then(c => {
         if(c === "Cancel") {
@@ -70,26 +74,30 @@ async function indexRepository(index:LocalIndex) {
     let currentDocCount = 0;
     const items = [];
     for(const file of files) {
-        const document = await vscode.workspace.openTextDocument(file);
-        const content = document.getText();
-
-        const chunks = splitStr(content, 1000, 200);
-        console.log(document.fileName, chunks.length);
-        
-        for(let i = 0; i < chunks.length; i++)
-        {
-            // const vector = await vectorize(api, chunks[i]);
-            const metadata = {
-                text: chunks[i],
-                page: i+1,
-                languageId: document.languageId,
-                fileName: document.fileName,
-                filePath: file.path,
-                lineCount: document.lineCount
-            };
-            items.push(metadata);
-
-            // await index.insertItem({vector, metadata});
+        try {
+            const document = await vscode.workspace.openTextDocument(file);
+            const content = document.getText();
+    
+            const chunks = splitStr(content, 1500, 200);
+            console.debug(document.fileName, chunks.length);
+            
+            for(let i = 0; i < chunks.length; i++)
+            {
+                // const vector = await vectorize(api, chunks[i]);
+                const metadata = {
+                    text: chunks[i],
+                    page: i+1,
+                    languageId: document.languageId,
+                    fileName: document.fileName,
+                    filePath: file.path,
+                    lineCount: document.lineCount
+                };
+                items.push(metadata);
+            }
+        }
+        catch(error) {
+            console.error("failed to index file", file);
+            console.error(error);
         }
     }
 
@@ -111,7 +119,7 @@ async function indexRepository(index:LocalIndex) {
 
         updateStatus(currentDocCount++, items.length);
         const vector = await vectorize(api, i.text);
-        await index.insertItem({vector, metadata: i})
+        await index.insertItem({vector, metadata: i});
     }
 
     statusBar.hide();

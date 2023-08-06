@@ -4,7 +4,7 @@ import { LocalIndex, MetadataTypes, QueryResult } from 'vectra';
 import {join as joinPath} from 'path';
 import { createOpenAiApi } from '@juno/llm/openai';
 import { OpenAIApi } from 'openai';
-import { createSystemMessage, initializeConversation, runConversation } from '@juno/common';
+import { createSystemMessage, getPeristentWorkspaceFolderPath, initializeConversation, runConversation } from '@juno/common';
 
 /**
  * Executes a query on the vector indexes of the repository.
@@ -18,7 +18,8 @@ import { createSystemMessage, initializeConversation, runConversation } from '@j
  */
 export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
 
-    const index = new LocalIndex(joinPath(ctx.extensionPath, 'vectors'));
+    const workspacePath = getPeristentWorkspaceFolderPath(ctx);
+    const index = new LocalIndex(joinPath(workspacePath, 'vectors'));
 
     if (!await index.isIndexCreated()) {
         await index.createIndex();
@@ -31,7 +32,6 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
         return;
     }
 
-    console.log("query repo")
     let userInput = await vscode.window.showInputBox({
         placeHolder: 'Query',
         prompt: 'Query the vector indexes',
@@ -85,7 +85,7 @@ ${result.item.metadata["text"]}
 
 ---
 
-`
+`;
 }
 
 async function getVector(api:OpenAIApi, text: string) {

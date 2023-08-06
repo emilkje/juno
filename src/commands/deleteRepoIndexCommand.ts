@@ -2,6 +2,7 @@ import { createCommand } from '@juno/command';
 import * as vscode from 'vscode';
 import { LocalIndex } from 'vectra';
 import {join as joinPath} from 'path';
+import { getPeristentWorkspaceFolderPath } from '@juno/common';
 
 /**
  * Indexes the repository by creating an index, gathering all the documents
@@ -14,7 +15,8 @@ import {join as joinPath} from 'path';
 export const deleteRepoIndexCommand = createCommand('juno.deleteRepoIndex', async (ctx, uri:vscode.Uri) => {
 
     // create a local filesystem index database 
-    const index = new LocalIndex(joinPath(ctx.extensionPath, 'vectors'));
+    const vectorPath = joinPath(getPeristentWorkspaceFolderPath(ctx), 'vectors');
+    const index = new LocalIndex(vectorPath);
 
     if (await index.isIndexCreated()) {
         await index.deleteIndex();

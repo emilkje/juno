@@ -3,6 +3,7 @@ import { InferenceOptions, MODEL_KEY, conversation, createOpenAiApi } from '@jun
 import { createResultPanel } from '@juno/ui/panel';
 import { ChatCompletionRequestMessage } from 'openai';
 import { marked } from 'marked';
+import { join as joinPath } from 'path';
 
 export async function runConversation(context: vscode.ExtensionContext, messages: ChatCompletionRequestMessage[]): Promise<string> {
 	const openai = createOpenAiApi();
@@ -17,7 +18,7 @@ export async function runConversation(context: vscode.ExtensionContext, messages
 	const options:InferenceOptions = {
 		model,
 		onDidStart: () => {
-			console.log('inference started')
+			console.log('inference started');
 			// panel.webview.postMessage({type: 'stream.start'})
 		},
 		onDidUpdate: (content) => {
@@ -152,4 +153,14 @@ ${scratchpad}`;
     }
 
     return systemMessage;
+}
+
+export function getPeristentWorkspaceFolderPath(ctx:vscode.ExtensionContext):string {
+	const workspaceId = ctx.workspaceState.get<string>("juno.workspaceId");
+	
+	if(!workspaceId) {
+		throw new Error("Failed to retrieve persistent storage path for this workspace.");
+	}
+	
+	return joinPath(ctx.extensionPath, ".data", workspaceId);
 }

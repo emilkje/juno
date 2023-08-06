@@ -3,6 +3,9 @@
   "displayName": "Juno",
   "description": "A junior code assistant at your fingertips",
   "version": "0.0.1",
+  "repository": {
+    "url": "https://github.com/emilkje/juno"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -78,8 +81,11 @@
   },
   "scripts": {
     "prepare": "npx ts-patch install -s",
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run esbuild-base -- --minify",
     "compile": "tspc -p ./",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "npm run esbuild-base -- --sourcemap",
+    "esbuild-watch": "npm run esbuild-base -- --sourcemap --watch",
     "watch": "tspc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
@@ -94,6 +100,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "@vscode/test-electron": "^2.3.2",
+    "esbuild": "^0.18.18",
     "eslint": "^8.41.0",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",

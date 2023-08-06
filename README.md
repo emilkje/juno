@@ -1,71 +1,38 @@
-# juno README
+# Juno, your Junior Developer Assistant :sparkles:
 
-This is the README for your extension "juno". After writing up a brief description, we recommend including the following sections.
+![GitHub](https://img.shields.io/github/license/emilkje/juno)
+![GitHub issues](https://img.shields.io/github/issues/emilkje/juno)
 
-## Features
+Unleash AI power with `Juno` at your side! Leveraging the power of OpenAI, this handy sidekick is here to assist you in your coding journey. By **generating and evaluating code**, `Juno` plays a pivotal role in not only boosting your productivity but also indicating potential areas of improvement. Let's eliminate those pesky bugs together! :beetle:
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## :zap: Features 
 
-For example if there is an image subfolder under your extension project workspace:
+### :sparkles: Create Code
 
-\!\[feature X\]\(images/feature-x.png\)
+Using the current editor document or selection run `Create Code` and `Juno` will help generate code using your own code as context to help you write code or documentation. Get ready to turn those blank lines into art! :pencil2:
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+### :bulb: Suggest Improvements
 
-## Requirements
+Improve your code quality in a jiffy. Use `Suggest Improvements` to get insightful recommendations on how you can enhance your code. Tap into the collective intelligence of countless developers! :brain:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### :mag: Index Repository
 
-## Extension Settings
+`Index Repository` enables you to have a more insightful interaction with your repository. It will vectorize the repository to enable a semantic search, turning your repository into an information goldmine. :open_book:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+### :eyes: Query Repository 
 
-For example:
+Query your repository like never before. `Query Repository` will execute a semantic search against the vectors and generate a response, transforming your code exploration into a fun adventure! :detective:
 
-This extension contributes the following settings:
+## How to Use
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+1. Install the `Juno` extension from VSCode Marketplace.
+2. Look for command contributions in your command palette (`Shift+CMD+P` or `F1`).
+3. Start exploring!
 
-## Known Issues
+## Feedback :mailbox:
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Loving `Juno`? I want to hear from you! Create a [new issue](https://github.com/emilkje/juno/issues/new) on [GitHub](https://github.com/your-github-username/juno) :bug:
 
-## Release Notes
+Got ideas on how we can make `Juno` better? I'm all ears! Share your thoughts on our [GitHub Discussions](https://github.com/your-github-username/juno/discussions) page :speech_balloon:
 
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+I hope `Juno` accelerates your learning, empowers you to code better, and makes programming an absolute joy. Happy coding! :heart:

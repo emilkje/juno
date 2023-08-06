@@ -5,6 +5,8 @@
 
 Unleash AI power with `Juno` at your side! Leveraging the power of OpenAI, this handy sidekick is here to assist you in your coding journey. By **generating and evaluating code**, `Juno` plays a pivotal role in not only boosting your productivity but also indicating potential areas of improvement. Let's eliminate those pesky bugs together! :beetle:
 
+![Example](./docs/video_sample.gif)
+
 ## :zap: Features 
 
 ### :sparkles: Create Code

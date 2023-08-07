@@ -4,8 +4,6 @@ import { createCommand } from '@juno/command';
 import { createOpenAiApi } from '@juno/llm/openai';
 import { FunctionRegistry, continueChatWithFunctionResult, handleFunctionCall, runFunctionChatCompletion } from '@juno/llm/openai/functions';
 
-const openaiApi = createOpenAiApi();
-
 interface Animal {
     name: string,
     sound: string
@@ -47,6 +45,8 @@ const functionMap: FunctionRegistry = {
 }
 
 export const functionExampleCommand = createCommand('juno.functionsExample', async () => {
+    const openaiApi = createOpenAiApi();
+
     if (!openaiApi) {
         console.error("openai not found");
         return;

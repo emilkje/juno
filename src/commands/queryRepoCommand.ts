@@ -2,9 +2,10 @@ import { createCommand } from '@juno/command';
 import * as vscode from 'vscode';
 import { LocalIndex } from 'vectra';
 import {join as joinPath} from 'path';
-import { createOpenAiApi } from '@juno/llm/openai';
+import { conversation, createOpenAiApi } from '@juno/llm/openai';
 import * as vectors from '@juno/vectorization';
 import { createSystemMessage, getPeristentWorkspaceFolderPath, initializeConversation, runConversation } from '@juno/common';
+import { createResultPanel } from '@juno/ui/panel';
 
 /**
  * Executes a query on the vector indexes of the repository.
@@ -18,23 +19,27 @@ import { createSystemMessage, getPeristentWorkspaceFolderPath, initializeConvers
  */
 export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
 
+    const api = createOpenAiApi();
+
     const workspacePath = getPeristentWorkspaceFolderPath(ctx);
     const index = new LocalIndex(joinPath(workspacePath, 'vectors'));
 
     if (!await index.isIndexCreated()) {
-        await index.createIndex();
-    }
+        await vscode.window.showInformationMessage(
+            "Vector database needs to be indexed first", 
+            "Create Index")
+            .then(async (choice) => {
+                if(choice === "Create Index") {
+                    await vscode.commands.executeCommand("juno.indexRepo");
+                }
+            });
 
-    const api = createOpenAiApi();
-
-    if(!api) {
-        console.log("failed to get openai api");
         return;
     }
 
     let userInput = await vscode.window.showInputBox({
         placeHolder: 'Query',
-        prompt: 'Query the vector indexes',
+        prompt: 'Ask a question or give an instruction',
         value: ''
     });
 
@@ -42,10 +47,31 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
         return;
     }
 
+    // vscode.window.showInformationMessage("gathering relevant information...");
+    const panel = await createResultPanel(ctx.extensionUri, ctx.extensionPath);
+    panel.webview.postMessage({type: 'strem.start'});
+
     const results = await vectors.search(api, index, userInput, 3);
     const context = vectors.filesContextFormatter.format(results);
 
-    const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 
+    let instructions = `Given the information provided by $USER, please extract keywords relevant for for a search to discover additional important infomration (such as important dependencies and references). Extract the keywords without formatting, only newlines between the items. Keep the list as short as possible and prioritize the 3 most important items to answer the following question: ${userInput}`;
+    
+    let systemMessage = createSystemMessage(ctx, instructions, false);
+    console.log("using system message", systemMessage);
+
+    let messages = initializeConversation(systemMessage);
+    messages.push({role: 'user', content: context});
+    
+    const additionalInfoQuery = await conversation(api, messages);
+
+    console.log('querying for additional info');
+    console.log(additionalInfoQuery);
+
+    const additionalInfo = await vectors.search(api, index, additionalInfoQuery);
+    const additionalContext = vectors.filesContextFormatter.format(additionalInfo);
+    console.log("received additional context", additionalContext);
+    
+    instructions = `$USER will ask specific questions related to the following CONTEXT that you will try to answer as best as possible. 
 
     Always adhere to the folling rules:
     
@@ -55,16 +81,14 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
     
     The following CONTEXT contains a list of files and its contents. This information is always relavant to the question.
     It is helpful to show the relevant code from this context. Do not answer questions that cannot be inferred from the context.
+    $USER might provide additional context in their messages, use this information as well when formulating an answer.
     
     CONTEXT:
     ${context}`;
     
-    const systemMessage = createSystemMessage(ctx, instructions, false);
-    console.log("using system message", systemMessage);
+    systemMessage = createSystemMessage(ctx, instructions, false)
+    messages = initializeConversation(systemMessage);
 
-    const messages = initializeConversation(systemMessage);
-
-    messages.push({role: 'user', content: userInput});
-    
+    messages.push({role: 'user', content: `Question: ${userInput}\n\n Additional Context: ${additionalContext}`});
     await runConversation(ctx, messages);
 });

@@ -3,6 +3,7 @@
   "displayName": "Juno",
   "description": "A junior code assistant at your fingertips",
   "version": "0.0.1",
+  "publisher": "emilkje",
   "repository": {
     "url": "https://github.com/emilkje/juno"
   },

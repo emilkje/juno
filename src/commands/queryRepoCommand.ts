@@ -42,7 +42,7 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
         return;
     }
 
-    const results = await vectors.query(api, index, userInput, 3);
+    const results = await vectors.search(api, index, userInput, 3);
     const context = vectors.filesContextFormatter.format(results);
 
     const instructions = `$USER will ask both generic and specific questions that you will try to answer as best as possible. 

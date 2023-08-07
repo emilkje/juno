@@ -2,10 +2,10 @@ import { ChatCompletionFunctions, ChatCompletionRequestMessage, CreateChatComple
 
 const model = 'gpt-3.5-turbo-0613';
 const temperature = 0.2;
-const systemPrompt = "You are a helpful assistant.";
+const systemPrompt = "You are a helpful assistant. You will be tasked to answer questions and you are to answer using only the available functions. Do noe provide information that is not received from the functions.";
 
-interface FunctionData {
-    function: (...args: any[]) => any;
+export interface FunctionData {
+    function: (...args: any[]) => Promise<any>;
     object: ChatCompletionFunctions;
 }
 
@@ -18,7 +18,6 @@ export async function runFunctionChatCompletion(openaiApi:OpenAIApi, functionReg
         model,
         temperature,
         messages: [
-            { role: 'system', content: systemPrompt },
             ...chatHistory,
             { role: 'user', content: userMessage },
         ],
@@ -33,40 +32,63 @@ function getFunctions(functionRegistry:FunctionRegistry):ChatCompletionFunctions
     return Object.values(functionRegistry).map(f => f.object);
 }
 
-export async function handleFunctionCall(openaiApi:OpenAIApi, functionRegistry:FunctionRegistry, chat: any, userMessage: string, chatHistory: ChatCompletionRequestMessage[]): Promise<string | undefined> {
+export type FunctionResponse = {
+    result: string | undefined,
+    functionName: any,
+}
+
+export async function handleFunctionCall(openaiApi:OpenAIApi, functionRegistry:FunctionRegistry, chat: any, userMessage: string, chatHistory: ChatCompletionRequestMessage[]): Promise<FunctionResponse | undefined> {
     const functionCall = chat.data.choices[0].message?.function_call;
     if (!functionCall) {
         console.error("openai indicates that it want to use a function but did not provide what function.", chat.data.choices[0].message);
         return;
     }
 
-    const functionResult = callFunction(functionRegistry, functionCall);
-    const chatWithFunction = await continueChatWithFunctionResult(openaiApi, userMessage, chatHistory, functionCall, functionResult);
-    return chatWithFunction.data.choices[0].message?.content;
+    const functionResult = await callFunction(functionRegistry, functionCall);
+    console.log("received function result", functionResult);
+    return {
+        result: functionResult,
+        functionName: functionCall
+    };
 }
 
-function callFunction(functionRegistry:FunctionRegistry, functionCall: any): any {
+async function callFunction(functionRegistry:FunctionRegistry, functionCall: any): Promise<any> {
     if (!functionCall || !functionCall.name || !functionRegistry[functionCall.name]) {
         console.error("Function call name is not available or not registered in functionRegistry", functionCall);
         return {};
     }
 
     const args = JSON.parse(functionCall.arguments) as any;
+    console.log("calling function", functionCall, "with arguments", args);
     const functionToCall = functionRegistry[functionCall.name].function;
-    return functionToCall(args);
+    return await functionToCall(args);
 }
 
-async function continueChatWithFunctionResult(openaiApi:OpenAIApi, userMessage: string, chatHistory: ChatCompletionRequestMessage[], functionCall: any, functionResult: any) {
-    const serializedFunctionResult = JSON.stringify(functionResult);
+export async function continueChatWithFunctionResult(openaiApi:OpenAIApi, userMessage: string, chatHistory: ChatCompletionRequestMessage[], response:FunctionResponse) {
+    const serializedFunctionResult = JSON.stringify(response.result);
     const chatCompletionRequest:CreateChatCompletionRequest = {
         model,
         messages: [
             { role: 'system', content: systemPrompt },
             ...chatHistory,
             { role: 'user', content: userMessage },
-            { role: "function", name: functionCall.name, content: serializedFunctionResult }, // needs to be JSON encoded
+            { role: "function", name: response.functionName.name, content: serializedFunctionResult }, // needs to be JSON encoded
         ],
     };
     
     return await openaiApi.createChatCompletion(chatCompletionRequest);
+}
+
+export function appendFunctionResult(openaiApi:OpenAIApi, userMessage: string, chatHistory: ChatCompletionRequestMessage[], response:FunctionResponse) {
+    const serializedFunctionResult = JSON.stringify(response.result);
+    const chatCompletionRequest:CreateChatCompletionRequest = {
+        model,
+        messages: [
+            ...chatHistory,
+            { role: 'user', content: userMessage },
+            { role: "function", name: response.functionName.name, content: serializedFunctionResult }, // needs to be JSON encoded
+        ],
+    };
+
+    return chatCompletionRequest;
 }

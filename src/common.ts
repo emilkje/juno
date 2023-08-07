@@ -164,3 +164,13 @@ export function getPeristentWorkspaceFolderPath(ctx:vscode.ExtensionContext):str
 	
 	return joinPath(ctx.extensionPath, ".data", workspaceId);
 }
+
+let extensionContext:vscode.ExtensionContext;
+
+export function getExtensionContext():vscode.ExtensionContext {
+	return extensionContext;
+}
+
+export function setExtensionContext(ctx:vscode.ExtensionContext) {
+	extensionContext = ctx;
+}

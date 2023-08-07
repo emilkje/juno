@@ -18,6 +18,8 @@ const excludes = [
     '**/package-lock.json'
 ];
 
+const [chunkLength, overlap] = [2000, 300];
+
 export const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 
 /**
@@ -72,18 +74,17 @@ async function indexRepository(index:LocalIndex) {
     });
     
     let currentDocCount = 0;
-    const items = [];
+    const splittedDocuments = [];
     for(const file of files) {
         try {
             const document = await vscode.workspace.openTextDocument(file);
             const content = document.getText();
     
-            const chunks = splitStr(content, 1500, 200);
+            const chunks = splitStr(content, chunkLength, overlap);
             console.debug(document.fileName, chunks.length);
             
             for(let i = 0; i < chunks.length; i++)
             {
-                // const vector = await vectorize(api, chunks[i]);
                 const metadata = {
                     text: chunks[i],
                     page: i+1,
@@ -92,7 +93,7 @@ async function indexRepository(index:LocalIndex) {
                     filePath: file.path,
                     lineCount: document.lineCount
                 };
-                items.push(metadata);
+                splittedDocuments.push(metadata);
             }
         }
         catch(error) {
@@ -101,9 +102,9 @@ async function indexRepository(index:LocalIndex) {
         }
     }
 
-    console.log(`indexing ${items.length} chunks`);
+    console.log(`indexing ${splittedDocuments.length} chunks`);
         
-    for(const i of items) {
+    for(const document of splittedDocuments) {
         
         if(cancelled) {
             vscode.window.showWarningMessage(
@@ -117,9 +118,9 @@ async function indexRepository(index:LocalIndex) {
             return;
         }
 
-        updateStatus(currentDocCount++, items.length);
-        const vector = await vectorize(api, i.text);
-        await index.insertItem({vector, metadata: i});
+        updateStatus(currentDocCount++, splittedDocuments.length);
+        const vector = await vectorize(api, document.text);
+        await index.insertItem({vector, metadata: document});
     }
 
     statusBar.hide();

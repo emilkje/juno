@@ -8,7 +8,7 @@ export { openPromptCommand } from './openPromptCommand';
 export { selectModelCommand } from './selectModelCommand';
 export { suggestImprovementsCommand } from './suggestImprovementsCommand';
 export { createCodeCommand } from './createCodeCommand';
-// export { functionExampleCommand } from './functionsExampleCommand';
+export { functionExampleCommand } from './functionsExampleCommand';
 export { indexRepoCommand } from './indexRepoCommand';
 export { indexFileCommand } from './indexFileCommand';
 export { queryRepoCommand } from './queryRepoCommand';

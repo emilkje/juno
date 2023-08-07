@@ -42,7 +42,7 @@ const functionMap: FunctionRegistry = {
         }
     }
     // add other functions here as needed
-}
+};
 
 export const functionExampleCommand = createCommand('juno.functionsExample', async () => {
     const openaiApi = createOpenAiApi();

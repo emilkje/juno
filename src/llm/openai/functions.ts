@@ -22,6 +22,7 @@ export async function runFunctionChatCompletion(openaiApi:OpenAIApi, functionReg
             { role: 'user', content: userMessage },
         ],
         functions: getFunctions(functionRegistry),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         function_call: 'auto',
     };
 
@@ -35,7 +36,7 @@ function getFunctions(functionRegistry:FunctionRegistry):ChatCompletionFunctions
 export type FunctionResponse = {
     result: string | undefined,
     functionName: any,
-}
+};
 
 export async function handleFunctionCall(openaiApi:OpenAIApi, functionRegistry:FunctionRegistry, chat: any, userMessage: string, chatHistory: ChatCompletionRequestMessage[]): Promise<FunctionResponse | undefined> {
     const functionCall = chat.data.choices[0].message?.function_call;

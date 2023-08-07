@@ -29,7 +29,7 @@ export async function runConversation(context: vscode.ExtensionContext, messages
 			console.log('inference finished');
 			panel.webview.postMessage({type: 'stream.end'});
 		}
-	}
+	};
 
 	return await conversation(openai, messages, options);
 }
@@ -59,7 +59,7 @@ export function getEditorContext():{language?:string,scratchpad?:string} {
 	return {
 		language,
 		scratchpad
-	}
+	};
 }
 
 export type PromptLoopOptions = {
@@ -68,7 +68,7 @@ export type PromptLoopOptions = {
 	initialValue?:string,
 	followupPlaceholder?:string,
 	followupPrompt?:string,
-}
+};
 /**
  * Starts a prompt loop where the user is given the ability to ask questions
  * @param context the vscode ExtensionContext
@@ -129,7 +129,7 @@ export function createSystemMessage(context:vscode.ExtensionContext, instruction
 
 	const defaultUser = 'The USER';
 	const configuredUser = `The USER (Name: ${userName})`;
-    const user = userName ? configuredUser : defaultUser
+    const user = userName ? configuredUser : defaultUser;
 
 	const personalizedInstructions = instruction
 		.replace("$USER", user)

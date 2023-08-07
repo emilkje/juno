@@ -2,12 +2,12 @@ import {join as joinPath} from 'path';
 import * as vscode from 'vscode';
 import { getNonce } from '@juno/ui/nonce';
 
-let _panel:vscode.WebviewPanel
-let _panelIsDisposed = false
+let _panel:vscode.WebviewPanel;
+let _panelIsDisposed = false;
 
 export async function createResultPanel(extensionUri:vscode.Uri, extensionPath:string):Promise<vscode.WebviewPanel> {
 
-	if(_panel && _panelIsDisposed == false) {
+	if(_panel && _panelIsDisposed === false) {
 		return _panel;
 	}
 

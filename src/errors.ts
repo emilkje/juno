@@ -53,6 +53,6 @@ export class AggregateConfigurationMissingError extends Error {
      * @memberof AggregateConfigurationMissingError
      */
     constructor(public configs:ConfigurationMissingError[]) {
-        super()
+        super();
     }
 }

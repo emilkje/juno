@@ -86,7 +86,7 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
     CONTEXT:
     ${context}`;
     
-    systemMessage = createSystemMessage(ctx, instructions, false)
+    systemMessage = createSystemMessage(ctx, instructions, false);
     messages = initializeConversation(systemMessage);
 
     messages.push({role: 'user', content: `Question: ${userInput}\n\n Additional Context: ${additionalContext}`});

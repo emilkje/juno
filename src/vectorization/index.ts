@@ -16,7 +16,7 @@ export const filesContextFormatter:QueryResultCollectionFormatter = {
     format: (results:QueryResultCollection) => results.map(({item}) => {
         return `filePath: ${item.metadata["filePath"]}\nlanguage: ${item.metadata["languageId"]}\ncontent:\n${item.metadata["text"]}`;
     }).join("\n\n---\n\n")
-}
+};
 
 export function getIndex() {
     const ctx = getExtensionContext();
@@ -68,4 +68,4 @@ export const vectorSearchTool:FunctionData = {
             required: ["query"],
         }
     }
-}
+};

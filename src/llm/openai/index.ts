@@ -42,7 +42,7 @@ export type InferenceOptions = {
 	onDidUpdate?:(content:string) => void,
 	onError?:(error:any) => void,
 	model?: string,
-}
+};
 
 /**
  * Creates an instance of the OpenAIApi.
@@ -55,12 +55,11 @@ export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMes
 			
 		options?.onDidStart?.();
 
-		const current_model = options?.model || defaultModel;
-		console.log(`creating chat completion using ${current_model}`);
-	
+		const model = options?.model || defaultModel;
+		console.log(`creating chat completion using ${model}`);
 		
 		openai.createChatCompletion({
-			model: current_model,
+			model: model,
 			messages: messages,
 			stream: true,
 		}, {responseType: 'stream'}).then(chatCompletion => {
@@ -70,10 +69,10 @@ export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMes
 			// const buffer:Array<string> = [];
 			// clear buffer when the conversation starts
 			// or add a separator for the next section
-			if(messages.filter(m => m.role == "user").length <= 1) {
+			if(messages.filter(m => m.role === "user").length <= 1) {
 				buffer = [];
 			} else {
-				buffer.push("\n\n---\n\n")
+				buffer.push("\n\n---\n\n");
 			}
 	
 			stream.on('data', (chunk:Buffer) => {
@@ -97,7 +96,7 @@ export function conversation(openai:OpenAIApi, messages:ChatCompletionRequestMes
 						} catch (error) {
 							options?.onError?.(error);
 							console.log(`Received error ${payload}.\n${error}`);
-							reject(error)
+							reject(error);
 						}
 					}
 				}

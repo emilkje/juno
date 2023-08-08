@@ -59,7 +59,7 @@ export async function createResultPanel(extensionUri:vscode.Uri, extensionPath:s
 		</head>
 		<body>
 			<p class="result"></div>
-			<div class="loading" style="display: none;">Let me think about this...</div>
+			<div class="loading" style="display: none;"></div>
 			<script nonce="${nonce}" src="${scriptUri}"></script>
 		</body>
 		</html>`;

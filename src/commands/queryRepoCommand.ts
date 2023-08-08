@@ -2,10 +2,47 @@ import { createCommand } from '@juno/command';
 import * as vscode from 'vscode';
 import { LocalIndex } from 'vectra';
 import {join as joinPath} from 'path';
-import { conversation, createOpenAiApi } from '@juno/llm/openai';
+import { InferenceOptions, conversation, createOpenAiApi } from '@juno/llm/openai';
 import * as vectors from '@juno/vectorization';
 import { createSystemMessage, getPeristentWorkspaceFolderPath, initializeConversation, runConversation } from '@juno/common';
 import { createResultPanel } from '@juno/ui/panel';
+import { ChatCompletionRequestMessage } from 'openai';
+import { FunctionRegistry, continueChatWithFunctionResult, handleFunctionCall, runFunctionChatCompletion, runFunctionExecutionLoop } from '@juno/llm/openai/functions';
+import { marked } from 'marked';
+
+
+
+// Then define the function with its associated function object
+const functionMap: FunctionRegistry = {
+    "getContext": {
+        function: async ({query}: {query: string}): Promise<string> => {
+            console.log("querying vectors: ", query)
+            const api = createOpenAiApi();
+            const index = vectors.getIndex();
+            const result = await vectors.search(api, index, query, 3);
+            const context = vectors.filesContextFormatter.format(result);
+            return context;
+        },
+        object: {
+            name: "getContext",
+            description: "Search the repository for additional context",
+            parameters: {
+                type: "object",
+                properties: {
+                    query: {
+                        type: "string",
+                        description: 'keyword to search for',
+                    },
+                },
+                required: ["query"],
+            }
+        },
+        displayExecution({query}: {query:string}): string {
+            return `gathering data: <span class="keyword">${query.split(" ").join('</span><span class="keyword">')}</span>`;
+        }
+    }
+    // add other functions here as needed
+};
 
 /**
  * Executes a query on the vector indexes of the repository.
@@ -47,48 +84,15 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
         return;
     }
 
-    // vscode.window.showInformationMessage("gathering relevant information...");
-    const panel = await createResultPanel(ctx.extensionUri, ctx.extensionPath);
-    panel.webview.postMessage({type: 'strem.start'});
+    const systemMessage = `You are a helpful assistant. You are to answer the users question as best as possible while respecting the following rules:
 
-    const results = await vectors.search(api, index, userInput, 3);
-    const context = vectors.filesContextFormatter.format(results);
+1. Do not make up an answer
+2. Use the available functions to retrieve information
+3. Continue search for information until you can confidently answer the question
 
-    let instructions = `Given the information provided by $USER, please extract keywords relevant for for a search to discover additional important infomration (such as important dependencies and references). Extract the keywords without formatting, only newlines between the items. Keep the list as short as possible and prioritize the 3 most important items to answer the following question: ${userInput}`;
-    
-    let systemMessage = createSystemMessage(ctx, instructions, false);
-    console.log("using system message", systemMessage);
+IMPORTANT: Do not answer the question without retrieving context`
 
-    let messages = initializeConversation(systemMessage);
-    messages.push({role: 'user', content: context});
+    const userMessage = `Use the getContext function to search the code base for information to answer the following question. Please present relevant code blocks if appropriate. If you are not confident in your answer, you can use the getContext function multiple times with new queries to help you get more information. Do not reference the getContext function in your answer.\n\nQuestion: ${userInput}`
     
-    const additionalInfoQuery = await conversation(api, messages);
-
-    console.log('querying for additional info');
-    console.log(additionalInfoQuery);
-
-    const additionalInfo = await vectors.search(api, index, additionalInfoQuery);
-    const additionalContext = vectors.filesContextFormatter.format(additionalInfo);
-    console.log("received additional context", additionalContext);
-    
-    instructions = `$USER will ask specific questions related to the following CONTEXT that you will try to answer as best as possible. 
-
-    Always adhere to the folling rules:
-    
-    1. Respond in markdown format
-    2. When providing code blocks you have to qualify it with what language. e.g \`\`\`javascript or \`\`\`typescript.
-    3. Always answer as $ASSISTANT and avoid using phrases as "as a large language model" etc.
-    
-    The following CONTEXT contains a list of files and its contents. This information is always relavant to the question.
-    It is helpful to show the relevant code from this context. Do not answer questions that cannot be inferred from the context.
-    $USER might provide additional context in their messages, use this information as well when formulating an answer.
-    
-    CONTEXT:
-    ${context}`;
-    
-    systemMessage = createSystemMessage(ctx, instructions, false);
-    messages = initializeConversation(systemMessage);
-
-    messages.push({role: 'user', content: `Question: ${userInput}\n\n Additional Context: ${additionalContext}`});
-    await runConversation(ctx, messages);
+    await runFunctionExecutionLoop(api, systemMessage, userMessage, functionMap);
 });

@@ -39,7 +39,8 @@ const functionMap: FunctionRegistry = {
                 },
                 required: ["animalType"],
             }
-        }
+        },
+        displayExecution: (...args:any[]) => `retrieving animal info`,
     }
     // add other functions here as needed
 };
@@ -65,8 +66,8 @@ export const functionExampleCommand = createCommand('juno.functionsExample', asy
         const result = await handleFunctionCall(openaiApi, functionMap, chat, userMessage, chatHistory);
         
         if(result) {
-            const chatWithFunction = await continueChatWithFunctionResult(openaiApi, userMessage, chatHistory, result);
-            answer = chatWithFunction.data.choices[0].message?.content;
+            const chatWithFunction = await continueChatWithFunctionResult(openaiApi, userMessage, chatHistory, result, functionMap);
+            answer = chatWithFunction.choices[0].message?.content;
         }
     }
     

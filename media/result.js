@@ -31,6 +31,12 @@
                     showLoading();
                     break;
                 }
+            case 'stream.function_call':
+                {
+                    hideLoading();
+                    addChunk(`<div class="functionContainer">${message.content}</div>`);
+                    break;
+                }
         }
     });
 

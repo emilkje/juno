@@ -14,3 +14,23 @@ hr {
 	margin: 5px 0 10px;
 	border: 1px solid var(--vscode-textSeparator-foreground);
 }
+
+.loading {
+	display: block;
+}
+
+.loading::after {
+	content: "let me think about this for a moment...";
+}
+
+.functionContainer {
+	background-color: var(--vscode-editor-foreground);
+	color: var(--vscode-editor-background);
+	padding: 5px;
+}
+
+span.keyword {
+	font-weight: bold;
+	text-decoration: underline;
+	font-family: var(--monaco-monospace-font);
+}

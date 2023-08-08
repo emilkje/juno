@@ -15,7 +15,9 @@ const excludes = [
     '**/node_modules/**',
     '**/out/**',
     '**/vectors/**',
-    '**/package-lock.json'
+    '**/package-lock.json',
+    '.*/**',
+    '**/.*/**'
 ];
 
 const [chunkLength, overlap] = [2000, 300];

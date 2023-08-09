@@ -66,8 +66,7 @@ export const functionExampleCommand = createCommand('juno.functionsExample', asy
         const result = await handleFunctionCall(openaiApi, functionMap, chat, userMessage, chatHistory);
         
         if(result) {
-            const chatWithFunction = await continueChatWithFunctionResult(openaiApi, userMessage, chatHistory, result, functionMap);
-            answer = chatWithFunction.choices[0].message?.content;
+            answer = await continueChatWithFunctionResult(openaiApi, userMessage, chatHistory, result, functionMap);
         }
     }
     

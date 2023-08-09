@@ -20,6 +20,8 @@ const excludes = [
     '**/.*/**'
 ];
 
+const maxFilSize = 20_000;
+
 const [chunkLength, overlap] = [2000, 300];
 
 export const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
@@ -81,6 +83,13 @@ async function indexRepository(index:LocalIndex) {
         try {
             const document = await vscode.workspace.openTextDocument(file);
             const content = document.getText();
+
+            if (content.length > maxFilSize) {
+                const workspaces = vscode.workspace.workspaceFolders;
+                const filePath = workspaces ? file.path.substring(workspaces[0].uri.path.length) : file.path;
+                vscode.window.showWarningMessage(`skipping ${filePath} due to excessive size`);
+                continue;
+            }
     
             const chunks = splitStr(content, chunkLength, overlap);
             console.debug(document.fileName, chunks.length);

@@ -1,4 +1,4 @@
-# Juno, your Junior Developer Assistant :sparkles:
+# Juno, your Junior Developer Assistant
 
 ![GitHub](https://img.shields.io/github/license/emilkje/juno)
 ![GitHub issues](https://img.shields.io/github/issues/emilkje/juno)

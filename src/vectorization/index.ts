@@ -24,6 +24,14 @@ export function getIndex() {
     return new LocalIndex(joinPath(workspacePath, 'vectors'));
 }
 
+/**
+ * Searches for matching records in a local index based on a given text input.
+ * @param api - The OpenAIApi object for making API calls.
+ * @param index - The LocalIndex object representing the index to be searched.
+ * @param text - The input text to be searched for in the index.
+ * @param topK - The maximum number of matching records to retrieve (default: 3).
+ * @returns A Promise that resolves to a QueryResultCollection containing the matching records.
+ */
 export async function search(api:OpenAIApi, index:LocalIndex, text: string, topK=3):Promise<QueryResultCollection> {
     const vector = await getVector(api, text);
     const results = await index.queryItems(vector, topK);
@@ -67,5 +75,6 @@ export const vectorSearchTool:FunctionData = {
             },
             required: ["query"],
         }
-    }
+    },
+    displayExecution: ({query}:{query:string}) => `gathering information...`
 };

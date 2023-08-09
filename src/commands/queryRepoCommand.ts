@@ -16,7 +16,7 @@ import { marked } from 'marked';
 const functionMap: FunctionRegistry = {
     "getContext": {
         function: async ({query}: {query: string}): Promise<string> => {
-            console.log("querying vectors: ", query)
+            console.log("querying vectors: ", query);
             const api = createOpenAiApi();
             const index = vectors.getIndex();
             const result = await vectors.search(api, index, query, 3);
@@ -90,9 +90,9 @@ export const queryRepoCommand = createCommand('juno.queryRepo', async (ctx) => {
 2. Use the available functions to retrieve information
 3. Continue search for information until you can confidently answer the question
 
-IMPORTANT: Do not answer the question without retrieving context`
+IMPORTANT: Do not answer the question without retrieving context`;
 
-    const userMessage = `Use the getContext function to search the code base for information to answer the following question. Please present relevant code blocks if appropriate. If you are not confident in your answer, you can use the getContext function multiple times with new queries to help you get more information. Do not reference the getContext function in your answer.\n\nQuestion: ${userInput}`
+    const userMessage = `Use the getContext function to search the code base for information to answer the following question. Please present relevant code blocks if appropriate. If you are not confident in your answer, you can use the getContext function multiple times with new queries to help you get more information. Do not reference the getContext function in your answer.\n\nQuestion: ${userInput}`;
     
     await runFunctionExecutionLoop(api, systemMessage, userMessage, functionMap);
 });

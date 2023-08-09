@@ -89,6 +89,7 @@ export async function continueChatWithFunctionResult(openaiApi:OpenAIApi, userMe
         model,
         messages,
         functions: getFunctions(functionRegistry),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         function_call: 'auto',
         stream: true,
     };
@@ -127,8 +128,7 @@ export async function continueChatWithFunctionResult(openaiApi:OpenAIApi, userMe
                 }
             });
         });
-    })
-
+    });
 }
 
 export function createFunctionResponseMessage(response:FunctionResponse): ChatCompletionRequestMessage {
@@ -136,7 +136,7 @@ export function createFunctionResponseMessage(response:FunctionResponse): ChatCo
         role: "function", 
         name: response.functionName.name, 
         content: JSON.stringify(response.result) // needs to be JSON encoded
-    }
+    };
 }
 
 export async function runFunctionExecutionLoop(api:OpenAIApi, systemMessage:string, userMessage:string, functions:FunctionRegistry) {

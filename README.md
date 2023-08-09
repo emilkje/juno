@@ -35,6 +35,6 @@ Query your repository like never before. `Query Repository` will execute a seman
 
 Loving `Juno`? I want to hear from you! Create a [new issue](https://github.com/emilkje/juno/issues/new) on [GitHub](https://github.com/emilkje/juno) 🪲
 
-Got ideas on how we can make `Juno` better? I'm all ears! Share your thoughts on our [GitHub Discussions](https://github.com/your-github-username/juno/discussions) page 💬
+Got ideas on how `Juno` can improve? I'm all ears! Share your thoughts by submitting an issue 💬
 
 I hope `Juno` accelerates your learning, empowers you to code better, and makes programming an absolute joy. Happy coding! 💜

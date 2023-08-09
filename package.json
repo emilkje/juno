@@ -4,6 +4,11 @@
   "description": "A junior code assistant at your fingertips",
   "version": "0.1.3",
   "publisher": "emilkje",
+  "icon": "assets/icon_128.png",
+  "galleryBanner": {
+    "color": "#131321",
+    "theme": "dark"
+  },
   "repository": {
     "url": "https://github.com/emilkje/juno"
   },
@@ -19,7 +24,7 @@
     "commands": [
       {
         "command": "juno.openPrompt",
-        "title": "Open Prompt",
+        "title": "General Prompt",
         "category": "Juno"
       },
       {
@@ -30,7 +35,7 @@
       {
         "command": "juno.selectModel",
         "category": "Juno",
-        "title": "Select model"
+        "title": "Select GPT Model"
       },
       {
         "command": "juno.createCode",
@@ -50,7 +55,7 @@
       {
         "command": "juno.deleteRepoIndex",
         "category": "Juno",
-        "title": "Delete Repository Vector Indicies"
+        "title": "Delete Repository Index"
       }
     ],
     "configuration": {

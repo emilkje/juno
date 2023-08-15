@@ -4,6 +4,10 @@ import { LocalIndex } from 'vectra';
 import {join as joinPath} from 'path';
 import { createOpenAiApi } from '@juno/llm/openai';
 import { OpenAIApi } from 'openai';
+import { MAX_FILE_SIZE, getIndex } from '@juno/vectorization';
+import { getPeristentWorkspaceFolderPath } from '@juno/common';
+import { commonExcludes } from '@juno/vectorization';
+import { matchUri } from '@juno/util/glob';
 
 /**
  * Indexes the repository by creating an index, gathering all the documents
@@ -15,15 +19,34 @@ import { OpenAIApi } from 'openai';
  */
 export const indexFileCommand = createCommand('juno.indexFile', async (ctx, uri:vscode.Uri) => {
 
+    let configuration = vscode.workspace.getConfiguration('juno');
+
+    if (!configuration.get<boolean>('activeIndexing')) {
+        if(ctx.workspaceState.get<boolean>("juno.hasPromptedActiveIndexing")) {
+            console.log("active indexing is disabled");
+            return;
+        }
+    }
+
+    if(commonExcludes.some(glob => matchUri(glob, uri))) {
+        console.log("skipping excluded file", uri.path);
+        return;
+    }
+    
+    if(uri.path.startsWith(getPeristentWorkspaceFolderPath(ctx))) {
+        console.log("skipping self referencing folder folder", uri.path);
+        return;
+    }
+
     // create a local filesystem index database 
-    const index = new LocalIndex(joinPath(ctx.extensionPath, 'vectors'));
+    const index = getIndex();
 
     if (!await index.isIndexCreated()) {
         await index.createIndex();
     }
 
     // run the indexer asynchronously.
-    indexFile(index, uri);
+    await indexFile(index, uri);
 });
 
 async function indexFile(index:LocalIndex, file:vscode.Uri) {
@@ -39,6 +62,15 @@ async function indexFile(index:LocalIndex, file:vscode.Uri) {
     const document = await vscode.workspace.openTextDocument(file);
     const content = document.getText();
     
+    if(content.length > MAX_FILE_SIZE) {
+        const workspaces = vscode.workspace.workspaceFolders;
+        const filePath = workspaces && workspaces.length > 0 
+            ? file.path.substring(workspaces[0].uri.path.length)
+            : file.path;
+        vscode.window.showWarningMessage(`skipping indexing of file ${filePath} due to excessive size`);
+        return;
+    }
+
     //TODO: deleting old index
 
     const chunks = splitStr(content, 1000, 200);

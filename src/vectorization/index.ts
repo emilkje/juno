@@ -12,6 +12,20 @@ interface QueryResultCollectionFormatter {
     format: (results:QueryResultCollection) => string,
 }
 
+export const MAX_FILE_SIZE = 30_000;
+
+export const commonExcludes = [
+    '**/node_modules/**',
+    '**/out/**',
+    '**/dist/**',
+    '**/vectors/**',
+    '**/package-lock.json',
+    '.*/**',
+    '**/.*/**',
+    '**/bin/**', // dotnet
+    '**/obj/**' // dotnet
+];
+
 export const filesContextFormatter:QueryResultCollectionFormatter = {
     format: (results:QueryResultCollection) => results.map(({item}) => {
         return `filePath: ${item.metadata["filePath"]}\nlanguage: ${item.metadata["languageId"]}\ncontent:\n${item.metadata["text"]}`;

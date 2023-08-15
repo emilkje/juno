@@ -2,7 +2,7 @@
   "name": "juno",
   "displayName": "Juno",
   "description": "A junior code assistant at your fingertips",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publisher": "emilkje",
   "icon": "assets/icon_128.png",
   "galleryBanner": {

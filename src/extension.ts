@@ -33,11 +33,13 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(statusBar);
 
-	// console.log('creating file watcher');
-	// const watcher = vscode.workspace.createFileSystemWatcher('**/src/**');
-	// watcher.onDidChange(e => {
-	// 	vscode.commands.executeCommand("juno.indexFile", e);
+	// const watcher = vscode.workspace.createFileSystemWatcher('**/*.*');
+	// watcher.onDidChange(async e => {
+	// 	console.log("executing change handler");
+	// 	await vscode.commands.executeCommand("juno.indexFile", e);
 	// });
+
+	// context.subscriptions.push(watcher);
 }
 
 // This method is called when your extension is deactivated

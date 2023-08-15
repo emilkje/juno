@@ -6,21 +6,13 @@ import { OpenAIApi } from 'openai';
 import { createCommand } from '@juno/command';
 import { createOpenAiApi } from '@juno/llm/openai';
 import { getPeristentWorkspaceFolderPath } from '@juno/common';
+import { MAX_FILE_SIZE } from '@juno/vectorization';
 
 // list of globs to include
 const includes = ['**/*.*'];
 
 // list of globs to exclude
-const excludes = [
-    '**/node_modules/**',
-    '**/out/**',
-    '**/vectors/**',
-    '**/package-lock.json',
-    '.*/**',
-    '**/.*/**'
-];
-
-const maxFilSize = 20_000;
+import { commonExcludes as excludes } from '@juno/vectorization';
 
 const [chunkLength, overlap] = [2000, 300];
 
@@ -84,7 +76,7 @@ async function indexRepository(index:LocalIndex) {
             const document = await vscode.workspace.openTextDocument(file);
             const content = document.getText();
 
-            if (content.length > maxFilSize) {
+            if (content.length > MAX_FILE_SIZE) {
                 const workspaces = vscode.workspace.workspaceFolders;
                 const filePath = workspaces ? file.path.substring(workspaces[0].uri.path.length) : file.path;
                 vscode.window.showWarningMessage(`skipping ${filePath} due to excessive size`);
